@@ -1,19 +1,28 @@
 import { useState } from "react";
 
-const initialItems = [
-  { id: 1, description: "Passports", quantity: 2, packed: true },
-  { id: 2, description: "Socks", quantity: 12, packed: false },
-  { id: 3, description: "Charger", quantity: 3, packed: false },
-  { id: 4, description: "Shoes", quantity: 2, packed: true },
-  { id: 5, description: "Laptop", quantity: 1, packed: false },
-];
+// const initialItems = [
+//   { id: 1, description: "Passports", quantity: 2, packed: true },
+//   { id: 2, description: "Socks", quantity: 12, packed: false },
+//   { id: 3, description: "Charger", quantity: 3, packed: false },
+//   { id: 4, description: "Shoes", quantity: 2, packed: true },
+//   { id: 5, description: "Laptop", quantity: 1, packed: false },
+// ];
 
 export default function App() {
+  const [items, setItems] = useState(
+    JSON.parse(localStorage.getItem("items")) || []
+  );
+
+  function handleAddItems(item) {
+    setItems((items) => [...items, item]);
+    localStorage.setItem("items", JSON.stringify([...items, item]));
+  }
+
   return (
     <div className="app">
       <Logo />
-      <Form />
-      <PackingList />
+      <Form onAddItems={handleAddItems} />
+      <PackingList items={items} />
       <Stats />
     </div>
   );
@@ -23,7 +32,7 @@ function Logo() {
   return <h1>🌴 Far Away 👜</h1>;
 }
 
-function Form() {
+function Form({ onAddItems }) {
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
 
@@ -32,12 +41,10 @@ function Form() {
 
     if (!description) return;
 
-    const newItem = { description, quantity, paacked: false, id: Date.now() };
-    console.log(newItem);
-
+    const newItem = { description, quantity, packed: false, id: Date.now() };
+    onAddItems(newItem);
     setDescription("");
     setQuantity(1);
-    initialItems.push(newItem);
   }
 
   return (
@@ -64,11 +71,11 @@ function Form() {
   );
 }
 
-function PackingList() {
+function PackingList({ items }) {
   return (
     <div className="list">
       <ul>
-        {initialItems.map((item) => (
+        {items.map((item) => (
           <Item item={item} key={item.id} />
         ))}
       </ul>
@@ -78,6 +85,7 @@ function PackingList() {
 
 function Item({ item }) {
   const itemStyle = { textDecoration: "line-through", color: "gray" };
+
   return (
     <li>
       <span style={item.packed ? itemStyle : {}}>
@@ -88,7 +96,7 @@ function Item({ item }) {
   );
 }
 
-function Stats() {
+function Stats({ items }) {
   return (
     <footer className="stats">
       <em>💼 You have X items on your list, and you already packed X (X%)</em>

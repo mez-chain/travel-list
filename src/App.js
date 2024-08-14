@@ -136,15 +136,25 @@ function Item({ item, onDeleteItem, onUpdateItem }) {
 }
 
 function Stats({ items }) {
+  if (!items.length) {
+    return (
+      <p className="stats">
+        <em>Start adding some items to you packing list 🚀</em>
+      </p>
+    );
+  }
+
   const totalItems = items.length;
   const totalPackedItems = items.filter((item) => item.packed).length;
-  const perecentage = Math.round((totalPackedItems / totalItems) * 100);
+  const percentage = Math.round((totalPackedItems / totalItems) * 100);
 
   return (
     <footer className="stats">
       <em>
-        💼 You have {totalItems} items on your list, and you already packed{" "}
-        {totalPackedItems} ({perecentage}%)
+        {percentage === 100
+          ? `You got everything! Ready to go ✈️`
+          : `💼 You have ${totalItems} items on your list, and
+        you already packed ${totalPackedItems} (${percentage}%)`}
       </em>
     </footer>
   );
